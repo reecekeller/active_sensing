@@ -66,8 +66,7 @@ def get_segment_area(angles, radius):
 
         # area compliment 
         area_c = np.pi*radius**2 - area
-        areas = [area, area_c].sort()
-        return areas
+        return np.sort(np.array([area, area_c]))
     
 def infoMetric(area1, area2):
     return 0.5 * np.abs(area1 + area2)
@@ -84,20 +83,17 @@ def info_map(arena, circle1_center, circle2_center, aperture, radius):
     # Iterate through a grid of points in the arena
     for i in tqdm(range(x_resolution)):
         for j in range(y_resolution):
-            print(info_mat.shape, '\n')
-
             source = (x[i], y[j], 20)
-
             area_circle1 = get_visible_area(source, circle1_center, radius, aperture)
             area_circle2 = get_visible_area(source, circle2_center, radius, aperture)
 
             # Check whether to use major or minor segment area
 
-            # fix 
-            if source[0] < arena.length/2:
+            # larger element of area_circle is last element
+            if source[0] > arena.length/2:
                 A1 = area_circle1[1]
                 A2 = area_circle2[0]
-            elif source[0] > arena.length/2:
+            elif source[0] < arena.length/2:
                 A1 = area_circle1[0]
                 A2 = area_circle2[1]
             else: 
