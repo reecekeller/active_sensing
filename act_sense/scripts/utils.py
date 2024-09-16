@@ -80,9 +80,12 @@ def info_map(arena, circle1_center, circle2_center, aperture, radius):
     y = np.linspace(0, arena.width, y_resolution)
 
     info_mat = np.zeros((x_resolution, y_resolution))
+    print(info_mat.shape, '\n')
     # Iterate through a grid of points in the arena
     for i in tqdm(range(x_resolution)):
         for j in range(y_resolution):
+            print(info_mat.shape, '\n')
+
             source = (x[i], y[j], 20)
 
             area_circle1 = get_visible_area(source, circle1_center, radius, aperture)
