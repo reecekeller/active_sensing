@@ -1,5 +1,5 @@
 import numpy as np
-from scripts.arena import Arena, Aperture
+from scripts.arena import Arena, Aperture, Mouse, visualize_arena
 from tqdm import tqdm 
 import numpy as np
 
@@ -102,3 +102,12 @@ def info_map(arena, circle1_center, circle2_center, aperture, radius):
 
             info_mat[i, j] = infoMetric(A1, A2) 
     return info_mat
+
+
+arena = Arena(length=60, width=60, height=50)
+aperture = Aperture(arena_width=60, arena_height=50, arena_length=60, gap_width=10)
+circleL = (arena.width/2 - aperture.gap_width, arena.width, arena.height/2)
+circleR = (arena.width/2 + aperture.gap_width, arena.width, arena.height/2)
+
+mouse = Mouse(40, 20, 25)
+visualize_arena(arena, mouse, aperture)
