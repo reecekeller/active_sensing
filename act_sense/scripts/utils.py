@@ -24,7 +24,7 @@ def get_visibility(source, target, aperture):
         return False
 
 
-def get_visible_area(source, circle_center, radius, aperture):
+def get_visible_angles(source, circle_center, radius, aperture):
     """
     Calculate the visible area of a circle from a given point by checking the visibility
     of various points on the circle's perimeter.
@@ -44,8 +44,8 @@ def get_visible_area(source, circle_center, radius, aperture):
         if flag:
             visible_angles.append(angles[i])
     #print(len(angles), len(visible_angles))
-    area  = get_segment_area(visible_angles, radius)
-    return area
+    #area  = get_segment_area(visible_angles, radius)
+    return visible_angles
 
 def get_segment_area(angles, radius):
     if len(angles)==0:
@@ -53,27 +53,28 @@ def get_segment_area(angles, radius):
     else:
         # Sort the angles
         angles = np.sort(angles)
-        
         # Calculate the differences between consecutive angles
-        diffs = np.diff(angles, append=angles[0] + 2 * np.pi - angles[-1])
-        
+        if (0 in angles):
+            diffs = np.diff(angles, append=angles[-1]-angles[0])# + 2 * np.pi - angles[-1])
+        else:
+            diffs = np.abs(np.diff(angles, append=angles[0]))
         # Find the largest gap, which is the central angle of the segment
-        central_angle = np.max(diffs)
-            
+        central_angle = np.max([np.max(diffs), np.min(diffs)])
+        #print(central_angle)
         # Calculate the area of the circular segment
         # Area of segment = 0.5 * radius^2 * (theta - sin(theta))
         area = 0.5 * radius**2 * (central_angle - np.sin(central_angle))
 
         # area compliment 
-        area_c = np.pi*radius**2 - area
-        return np.sort(np.array([area, area_c]))
-    
+        area_c = np.abs(np.pi*radius**2 - area)
+        return np.array([area, area_c])
+
 def infoMetric(area1, area2):
     return 0.5 * np.abs(area1 + area2)
 
 def info_map(arena, circle1_center, circle2_center, aperture, radius):
-    x_resolution = 60
-    y_resolution = 60
+    x_resolution = arena.width
+    y_resolution = arena.length - aperture.gap_width
 
     x = np.linspace(0, arena.length, x_resolution)
     y = np.linspace(0, arena.width, y_resolution)
@@ -84,30 +85,24 @@ def info_map(arena, circle1_center, circle2_center, aperture, radius):
     for i in tqdm(range(x_resolution)):
         for j in range(y_resolution):
             source = (x[i], y[j], 20)
-            area_circle1 = get_visible_area(source, circle1_center, radius, aperture)
-            area_circle2 = get_visible_area(source, circle2_center, radius, aperture)
+            visible_anglesL = get_visible_angles(source, circle1_center, radius, aperture)
+            visible_anglesR = get_visible_angles(source, circle2_center, radius, aperture)
+
+            area_circle1 = get_segment_area(visible_anglesL, radius)
+            area_circle2 = get_segment_area(visible_anglesR, radius)
 
             # Check whether to use major or minor segment area
 
             # larger element of area_circle is last element
             if source[0] > arena.length/2:
-                A1 = area_circle1[1]
-                A2 = area_circle2[0]
+                A1 = np.max(area_circle1)
+                A2 = np.min(area_circle2)
             elif source[0] < arena.length/2:
-                A1 = area_circle1[0]
-                A2 = area_circle2[1]
+                A1 = np.min(area_circle1)
+                A2 = np.max(area_circle2)
             else: 
                 A1 = area_circle1[0]
                 A2 = area_circle2[0]    
 
             info_mat[i, j] = infoMetric(A1, A2) 
     return info_mat
-
-
-arena = Arena(length=60, width=60, height=50)
-aperture = Aperture(arena_width=60, arena_height=50, arena_length=60, gap_width=10)
-circleL = (arena.width/2 - aperture.gap_width, arena.width, arena.height/2)
-circleR = (arena.width/2 + aperture.gap_width, arena.width, arena.height/2)
-
-mouse = Mouse(40, 20, 25)
-visualize_arena(arena, mouse, aperture)

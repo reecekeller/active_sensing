@@ -65,12 +65,12 @@ def visualize_arena(arena, mouse, aperture):
     art3d.pathpatch_2d_to_3d(right_wall, z=arena.width-10, zdir="y")
 
     # Plot first circle on the left side
-    circle1 = patches.Circle((aperture.left_wall_edge[0], arena.height/2), 5, color='green')
+    circle1 = patches.Circle(( - 10, arena.height/2), 5, color='green')
     ax.add_patch(circle1)
     art3d.pathpatch_2d_to_3d(circle1, z=arena.length, zdir="y")
 
     # Plot second circle on the right side
-    circle2 = patches.Circle((aperture.right_wall_edge[0], arena.height/2), 5, color='red')
+    circle2 = patches.Circle((+ 10, arena.height/2), 5, color='red')
     ax.add_patch(circle2)
     art3d.pathpatch_2d_to_3d(circle2, z=arena.length, zdir="y")
     
