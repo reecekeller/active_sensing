@@ -73,8 +73,8 @@ def infoMetric(area1, area2):
     return 0.5 * np.abs(area1 + area2)
 
 def info_map(arena, circle1_center, circle2_center, aperture, radius):
-    x_resolution = arena.width
-    y_resolution = arena.length - aperture.gap_width
+    x_resolution = 150#arena.width
+    y_resolution = 150#arena.length - aperture.gap_width
 
     x = np.linspace(0, arena.length, x_resolution)
     y = np.linspace(0, arena.width, y_resolution)
